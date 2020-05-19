@@ -1,8 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Image, Dimensions, ImageBackground, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, Image, Dimensions, ImageBackground, TextInput, Alert, Text } from 'react-native';
 import Firebase, { db } from '../config/Firebase';
 import Register from '../components/Register';
 import { CommonActions } from '@react-navigation/native';
+import RadioForm from 'react-native-simple-radio-button';
+import { RFPercentage } from "react-native-responsive-fontsize";
 import { YellowBox } from 'react-native';
 import _ from 'lodash';
 
@@ -16,16 +18,17 @@ console.warn = message => {
 
 
 export default class RegisterScreen extends React.Component {
-
-    resetstate() {
-        state = {
-            username: '',
-            age: '',
-            gender: '',
-            email: '',
-            password: ''
-        };
-    }
+    state = {
+        username: '',
+        age: '',
+        gender: 'Masculino',
+        email: '',
+        password: '',
+        genderTypes: [
+            { label: 'Masculino', value: 0 },
+            { label: 'Femenino', value: 1 }
+        ]
+    };
 
     handleRegisterPress = () => {
         let component = this;
@@ -42,7 +45,7 @@ export default class RegisterScreen extends React.Component {
                 })
                 .then((result) => {
                     if (result) {
-                        const user=result.user;
+                        const user = result.user;
                         user.updateProfile({
                             displayName: username,
                         });
@@ -106,7 +109,6 @@ export default class RegisterScreen extends React.Component {
     }
 
     render() {
-        this.resetstate();
         return (
             <View style={styles.container}>
                 <View style={styles.topContainer}>
@@ -127,19 +129,34 @@ export default class RegisterScreen extends React.Component {
                             autoCapitalize='none'
                         />
                         <TextInput
-                            style={styles.inputBox3}
+                            style={styles.inputBox4}
                             onChangeText={age => this.setState({ age })}
                             placeholder='Edad'
                             placeholderTextColor='#4b3c74'
                             autoCapitalize='none'
                         />
-                        <TextInput
-                            style={styles.inputBox3}
-                            onChangeText={gender => this.setState({ gender })}
-                            placeholder='Género'
-                            placeholderTextColor='#4b3c74'
-                            autoCapitalize='none'
-                        />
+                        <View style={styles.radioButtonContainer}>
+                            <Text style={{ fontSize: RFPercentage(2.5), color: "#4b3c74", marginBottom: '5%' }}>
+                                Género:
+                            </Text>
+                            <RadioForm
+                                radio_props={this.state.genderTypes}
+                                initial={0}
+                                formHorizontal={true}
+                                labelHorizontal={true}
+                                buttonColor={'#2196f3'}
+                                animation={true}
+                                buttonSize={15}
+                                labelStyle={{ fontSize: RFPercentage(2.5), color: '#4b3c74', marginHorizontal: '4%' }}
+                                onPress={(value) => {
+                                    if (value == 0) {
+                                        this.setState({ gender: 'Masculino' });
+                                    } else if (value == 0) {
+                                        this.setState({ gender: 'Femenino' });
+                                    }
+                                }}
+                            />
+                        </View>
                         <TextInput
                             style={styles.inputBox3}
                             onChangeText={email => this.setState({ email })}
@@ -198,11 +215,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'column',
     },
+    radioButtonContainer: {
+        width: '70%',
+        flexDirection: 'column',
+        justifyContent: 'flex-end'
+    },
     inputBox1: {
         marginTop: '13%',
         width: '70%',
         margin: '2.6%',
-        fontSize: 16,
+        fontSize: RFPercentage(2.5),
         color: "#4b3c74",
         borderColor: '#4b3c74',
         borderBottomWidth: 1,
@@ -212,7 +234,7 @@ const styles = StyleSheet.create({
         marginTop: '1.3%',
         width: '70%',
         margin: '2.6%',
-        fontSize: 16,
+        fontSize: RFPercentage(2.5),
         color: "#4b3c74",
         borderColor: '#4b3c74',
         borderBottomWidth: 1,
@@ -220,17 +242,28 @@ const styles = StyleSheet.create({
         marginBottom: '13%',
     },
     inputBox3: {
-        marginTop: '1.3%',
+        marginTop: '3%',
         width: '70%',
         margin: '2.6%',
-        fontSize: 16,
+        fontSize: RFPercentage(2.5),
+        color: "#4b3c74",
+        borderColor: '#4b3c74',
+        borderBottomWidth: 1,
+        textAlign: 'left',
+    },
+    inputBox4: {
+        marginTop: '1.3%',
+        marginBottom: '4%',
+        width: '70%',
+        margin: '2.6%',
+        fontSize: RFPercentage(2.5),
         color: "#4b3c74",
         borderColor: '#4b3c74',
         borderBottomWidth: 1,
         textAlign: 'left',
     },
     buttonStyle: {
-        width:'50%',
-        aspectRatio: 921/231, 
+        width: '50%',
+        aspectRatio: 921 / 231,
     }
 });

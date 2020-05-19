@@ -3,6 +3,7 @@ import { StyleSheet, TextInput, View, Image, ImageBackground, Dimensions, Alert 
 import Login from '../components/Login';
 import Firebase, { db } from '../config/Firebase';
 import { CommonActions } from '@react-navigation/native';
+import { RFPercentage } from "react-native-responsive-fontsize";
 
 export default class SignInScreen extends React.Component {
     resetstate() {
@@ -15,6 +16,7 @@ export default class SignInScreen extends React.Component {
     goToProfile = uid => {
         db.collection('users').doc(uid).get().then((user) => {
             let params = user.data();
+            params.uid=uid;
             this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 1,
@@ -129,7 +131,7 @@ const styles = StyleSheet.create({
         marginTop: '13%',
         width: '70%',
         margin: '2.6%',
-        fontSize: 16,
+        fontSize: RFPercentage(2.5),
         color: "#e6b637",
         borderColor: '#e6b637',
         borderBottomWidth: 1,
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
         marginTop: '1.3%',
         width: '70%',
         margin: '2.6%',
-        fontSize: 16,
+        fontSize: RFPercentage(2.5),
         color: "#e6b637",
         borderColor: '#e6b637',
         borderBottomWidth: 1,
