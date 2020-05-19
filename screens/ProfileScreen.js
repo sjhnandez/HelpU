@@ -17,6 +17,7 @@ import * as Permissions from 'expo-permissions';
 import { st } from '../config/Firebase';
 
 export default class ProfileScreen extends React.Component {
+
     state = {
         fontsLoaded: false,
         emotionalState: '',
@@ -38,7 +39,6 @@ export default class ProfileScreen extends React.Component {
         }).catch(() => {
             this.setState({ profilePicture: require('../assets/addpp.png') });
         });
-
     }
 
     setEmotion = (emotion) => {
@@ -69,7 +69,6 @@ export default class ProfileScreen extends React.Component {
         const response = await fetch(uri);
         const blob = await response.blob();
         return st.ref().child('profile pictures/' + this.state.uid).put(blob);
-
     }
 
     render() {
@@ -89,8 +88,8 @@ export default class ProfileScreen extends React.Component {
                             </Text>
                         </View>
                         <View style={styles.container1img}>
-                            <ImageBackground style={{ height: '85%', aspectRatio: 1, marginTop: '50%' }} resizeMode='contain' source={require('../assets/ppborder.png')} >
-                                <AddImg style={styles.addimg} pickimg={this.pickImg} img={this.state.profilePicture} />
+                            <ImageBackground style={{ height: '85%', aspectRatio: 1, marginTop: '50%', }} resizeMode='contain' source={require('../assets/ppborder.png')} >
+                                <AddImg style={styles.addimg} pickimg={this.pickImg} img={this.state.profilePicture} resizeMode='cover' />
                             </ImageBackground>
                         </View>
                     </View>
@@ -183,7 +182,6 @@ export default class ProfileScreen extends React.Component {
             return <AppLoading />
         }
     };
-
 }
 
 
@@ -246,12 +244,12 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     addimg: {
-        borderRadius: 1000,
-        alignItems: 'center',
-        height: '86%',
+        height: '74%',
         aspectRatio: 1,
-        marginTop: '1.8%',
-        marginLeft: '10.5%',
+        marginTop: '3%',
+        marginLeft: '19.5%',
+        borderRadius: 10000,
+        overflow: 'hidden'
     }
 });
 

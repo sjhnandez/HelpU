@@ -4,9 +4,10 @@ import { TouchableOpacity, Image } from 'react-native';
 const addimg = props => {
     return (
         <TouchableOpacity activeOpacity={0.5} style={props.style}
-        onPress= {props.pickimg}>
-            <Image 
-                style = {props.style}
+            onPress={props.pickimg}
+        >
+            <Image
+                style={{flex:1, width:undefined, height:undefined}}
                 source={props.img}
                 resizeMode='stretch'
             />
