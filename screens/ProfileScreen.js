@@ -11,8 +11,6 @@ import OMG from '../components/OMG';
 import Enojado from '../components/Enojado';
 import Lloroso from '../components/Lloroso';
 import { RFPercentage } from "react-native-responsive-fontsize";
-import Yesbutton from '../components/yesbutton';
-import Nobutton from '../components/nobutton';
 import AddImg from '../components/AddImg';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
@@ -35,9 +33,9 @@ export default class ProfileScreen extends React.Component {
         });
         this.setState({ fontsLoaded: true });
         st.ref().child('profile pictures/' + this.state.uid).getDownloadURL().then(img => {
-                this.setState({ profilePicture: { uri: img } });
-                console.log(img);
-        }).catch(()=> {
+            this.setState({ profilePicture: { uri: img } });
+            console.log(img);
+        }).catch(() => {
             this.setState({ profilePicture: require('../assets/addpp.png') });
         });
 
@@ -177,14 +175,7 @@ export default class ProfileScreen extends React.Component {
                         <Text style={{ color: '#ffedd2', fontFamily: 'AvenirBold', fontSize: RFPercentage(2.5) }}>
                             no ha sido tu día...
                         </Text>
-                        <Text style={{ color: '#ffedd2', fontFamily: 'AvenirBold', fontSize: RFPercentage(2.5), marginBottom: '3%' }}>
-                            ¿Quieres hablar con un profesional?
-                        </Text>
-                        <View style={styles.buttonContainer}>
-                            <Yesbutton style={{ height: '70%', aspectRatio: 1, marginHorizontal: '5%' }} />
-                            <Nobutton style={{ height: '70%', aspectRatio: 1, marginHorizontal: '5%' }} />
-                        </View>
-                        <Image style={{ height: '10%', aspectRatio: 310 / 128, margin: '5%' }} source={require('../assets/logo_register.png')} />
+                        <Image style={{ height: '20%', aspectRatio: 310 / 128, margin: '5%' }} source={require('../assets/logo_register.png')} />
                     </ImageBackground>
                 </View>
             );
@@ -205,7 +196,7 @@ const styles = StyleSheet.create({
         alignContent: 'stretch',
     },
     canvas: {
-        flex: 6,
+        flex: 4,
         flexDirection: 'column',
         width: undefined,
         height: undefined,
@@ -255,12 +246,12 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     addimg: {
+        borderRadius: 1000,
         alignItems: 'center',
-        height: '85.5%',
+        height: '86%',
         aspectRatio: 1,
         marginTop: '1.8%',
-        marginLeft: '10.02%',
-        borderRadius:1000000000,
+        marginLeft: '10.5%',
     }
 });
 

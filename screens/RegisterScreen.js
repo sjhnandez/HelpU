@@ -126,14 +126,14 @@ export default class RegisterScreen extends React.Component {
                             onChangeText={username => this.setState({ username })}
                             placeholder='Nombre'
                             placeholderTextColor='#4b3c74'
-                            autoCapitalize='none'
                         />
                         <TextInput
                             style={styles.inputBox4}
                             onChangeText={age => this.setState({ age })}
                             placeholder='Edad'
                             placeholderTextColor='#4b3c74'
-                            autoCapitalize='none'
+                            keyboardType="numeric"
+                            contextMenuHidden={true}
                         />
                         <View style={styles.radioButtonContainer}>
                             <Text style={{ fontSize: RFPercentage(2.5), color: "#4b3c74", marginBottom: '5%' }}>
@@ -163,6 +163,7 @@ export default class RegisterScreen extends React.Component {
                             placeholder='Correo electrónico'
                             placeholderTextColor='#4b3c74'
                             autoCapitalize='none'
+                            keyboardType='email-address'
                         />
                         <TextInput
                             style={styles.inputBox2}
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     radioButtonContainer: {
-        width: '70%',
+        width: '71%',
         flexDirection: 'column',
         justifyContent: 'flex-end'
     },

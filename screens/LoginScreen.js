@@ -22,7 +22,7 @@ export default class SignInScreen extends React.Component {
                     index: 1,
                     routes: [
                         {
-                            name: 'ProfileScreen',
+                            name: 'TabbedHub',
                             params
                         },
                     ],
@@ -75,6 +75,7 @@ export default class SignInScreen extends React.Component {
                             placeholder='Email'
                             placeholderTextColor='#e6b637'
                             autoCapitalize='none'
+                            keyboardType="email-address"
                         />
                         <TextInput
                             style={styles.inputBox2}

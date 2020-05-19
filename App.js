@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import ProfileScreen from './screens/ProfileScreen';
+import TabbedHub from './screens/TabbedHub';
 
 
 const Stack = createStackNavigator();
@@ -20,7 +20,7 @@ export default class App extends React.Component {
 					<Stack.Screen name="HomeScreen" component={HomeScreen} />
 					<Stack.Screen name="RegisterScreen" component={RegisterScreen} />
 					<Stack.Screen name="LoginScreen" component={LoginScreen} />
-					<Stack.Screen name='ProfileScreen' component={ProfileScreen} />
+					<Stack.Screen name='TabbedHub' component={TabbedHub} />
 				</Stack.Navigator>
 			</NavigationContainer>
 		);
