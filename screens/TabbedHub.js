@@ -16,7 +16,8 @@ export default function TabbedHub(props) {
                 activeTintColor: '#e6b637',
                 inactiveTintColor:'#ffffff',
                 style: { borderTopWidth: 0 },
-            }}>
+            }}
+            lazy={true}>
                 <Tab.Screen name="Perfil"
                     component={ProfileScreen}
                     initialParams={props.route.params}

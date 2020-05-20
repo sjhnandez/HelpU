@@ -86,10 +86,13 @@ export default class ProfileScreen extends React.Component {
                             <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
                                 {this.props.route.params.age}
                             </Text>
+                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
+                                Te sientes {this.state.emotionalState}
+                            </Text>
                         </View>
                         <View style={styles.container1img}>
                             <ImageBackground style={{ height: '85%', aspectRatio: 1, marginTop: '50%', }} resizeMode='contain' source={require('../assets/ppborder.png')} >
-                                <AddImg style={styles.addimg} pickimg={this.pickImg} img={this.state.profilePicture} resizeMode='cover' />
+                                <AddImg style={styles.addimg} pickimg={this.pickImg} img={this.state.profilePicture} resizeMode='contain' />
                             </ImageBackground>
                         </View>
                     </View>
@@ -179,7 +182,7 @@ export default class ProfileScreen extends React.Component {
                 </View>
             );
         } else {
-            return <AppLoading />
+            return <AppLoading />;
         }
     };
 }
@@ -244,10 +247,10 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     addimg: {
-        height: '74%',
+        width: '65.5%',
         aspectRatio: 1,
-        marginTop: '3%',
-        marginLeft: '19.5%',
+        marginTop: '3.1%',
+        marginLeft: '18.5%',
         borderRadius: 10000,
         overflow: 'hidden'
     }
