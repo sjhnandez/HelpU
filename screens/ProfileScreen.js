@@ -19,8 +19,10 @@ import { st } from '../config/Firebase';
 export default class ProfileScreen extends React.Component {
 
     state = {
+        pbackgroundStyle: styles.pbackground2,
+        pStyle: styles.addimg2,
         fontsLoaded: false,
-        emotionalState: '',
+        emotionalState: '...',
         profilePicture: null,
         uid: null,
     }
@@ -35,9 +37,10 @@ export default class ProfileScreen extends React.Component {
         this.setState({ fontsLoaded: true });
         st.ref().child('profile pictures/' + this.state.uid).getDownloadURL().then(img => {
             this.setState({ profilePicture: { uri: img } });
-            console.log(img);
+            this.setState({ pbackgroundStyle: styles.pbackground });
+            this.setState({ pStyle: styles.addimg });
         }).catch(() => {
-            this.setState({ profilePicture: require('../assets/addpp.png') });
+            this.setState({ profilePicture: require('../assets/plus.png') });
         });
     }
 
@@ -58,6 +61,8 @@ export default class ProfileScreen extends React.Component {
                     const source = { uri: result.uri };
                     this.setState({ profilePicture: source });
                     this.uploadImage(result.uri);
+                    this.setState({ pbackgroundStyle: styles.pbackground });
+                    this.setState({ pStyle: styles.addimg });
                 }
             } catch (E) {
                 console.log(E);
@@ -80,20 +85,20 @@ export default class ProfileScreen extends React.Component {
                             <Text style={{ fontFamily: 'AvenirBold', fontSize: RFPercentage(4.7), color: '#4b3c74', marginBottom: '5%', marginTop: '15%' }}>
                                 Tu perfil
                             </Text>
-                            <Text style={{ fontFamily: 'AvenirReg', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '2%' }}>
+                            <Text style={{ fontFamily: 'AvenirReg', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '5%' }}>
                                 {this.props.route.params.username}
                             </Text>
-                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
+                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom:'5%' }}>
                                 {this.props.route.params.age}
                             </Text>
-                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
+                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
                                 Te sientes {this.state.emotionalState}
                             </Text>
                         </View>
                         <View style={styles.container1img}>
-                            <ImageBackground style={{ height: '85%', aspectRatio: 1, marginTop: '50%', }} resizeMode='contain' source={require('../assets/ppborder.png')} >
-                                <AddImg style={styles.addimg} pickimg={this.pickImg} img={this.state.profilePicture} resizeMode='contain' />
-                            </ImageBackground>
+                            <View style={this.state.pbackgroundStyle} >
+                                <AddImg style={this.state.pStyle} pickimg={this.pickImg} img={this.state.profilePicture} resizeMode='contain' />
+                            </View>
                         </View>
                     </View>
                     <View style={styles.container2}>
@@ -162,7 +167,7 @@ export default class ProfileScreen extends React.Component {
                             <Lloroso setEmotion={() => this.setEmotion('Lloroso')}
                                 style={styles.emotionButtonStyle} />
                             <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Lloroso
+                                Lloroso/a
                             </Text>
                         </View>
                     </View>
@@ -224,7 +229,7 @@ const styles = StyleSheet.create({
     container1img: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     container2: {
         flex: 1.6,
@@ -247,12 +252,41 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     addimg: {
-        width: '65.5%',
+        height: '95%',
         aspectRatio: 1,
-        marginTop: '3.1%',
-        marginLeft: '18.5%',
+        marginRight: '2%',
+        marginTop: '2%',
         borderRadius: 10000,
         overflow: 'hidden'
-    }
+    },
+    addimg2: {
+        height: '90%',
+        aspectRatio: 1,
+        borderRadius: 10000,
+        overflow: 'hidden',
+        marginTop: '6%'
+    },
+    pbackground: {
+        height: '70%',
+        borderRadius: 10000,
+        aspectRatio: 1,
+        backgroundColor: '#4f3976',
+        overflow: "hidden",
+        alignItems: 'flex-end',
+        justifyContent: 'flex-start',
+        marginTop: '20%',
+        marginRight: '20%'
+    },
+    pbackground2: {
+        height: '70%',
+        borderRadius: 10000,
+        aspectRatio: 1,
+        backgroundColor: '#4f3976',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: "hidden",
+        marginTop: '20%',
+        marginRight: '20%'
+    },
 });
 

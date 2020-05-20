@@ -20,7 +20,7 @@ export default class SelectableProfile extends React.Component {
     render() {
         if (this.state.fontsLoaded) {
             return (
-                <TouchableOpacity activeOpacity={0.5} style={{ width: '90%', height: undefined, aspectRatio: 3, marginHorizontal: '5%', marginVertical: '3%' }}
+                <TouchableOpacity activeOpacity={0.5} style={{ width: '90%', height: undefined, aspectRatio: 3, marginHorizontal: '5%', marginVertical: '3%', borderRadius:15, overflow:'hidden' }}
                     onPress={this.props.showProfile}
                 >
                     <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#4f3976' }}>
