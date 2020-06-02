@@ -1,20 +1,17 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, Alert, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, Alert, Dimensions, StatusBar } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo'
-import Inseguro from '../components/Inseguro';
-import Meh from '../components/Meh';
-import Triste from '../components/Triste';
-import Feliz from '../components/Feliz';
-import Genial from '../components/Genial';
-import OMG from '../components/OMG';
-import Enojado from '../components/Enojado';
-import Lloroso from '../components/Lloroso';
+import EmotionButton from '../components/EmotionButton';
+
 import { RFPercentage } from "react-native-responsive-fontsize";
 import AddImg from '../components/AddImg';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import { st } from '../config/Firebase';
+import Carousel from 'react-native-snap-carousel';
+
+const SCREEN_WIDTH=Dimensions.get("window").width;
 
 export default class ProfileScreen extends React.Component {
 
@@ -25,6 +22,40 @@ export default class ProfileScreen extends React.Component {
         emotionalState: '...',
         profilePicture: null,
         uid: null,
+        carouselItems: [
+            {
+                title: "Inseguro/a",
+                image: require('../assets/emojibutton1.png')
+            },
+            {
+                title: "Meh",
+                image: require('../assets/emojibutton2.png')
+            },
+            {
+                title: "Triste",
+                image: require('../assets/emojibutton3.png')
+            },
+            {
+                title: "Feliz",
+                image: require('../assets/emojibutton4.png')
+            },
+            {
+                title: "Genial",
+                image: require('../assets/emojibutton5.png')
+            },
+            {
+                title: "OMG",
+                image: require('../assets/emojibutton6.png')
+            },
+            {
+                title: "Enojado/a",
+                image: require('../assets/emojibutton7.png')
+            },
+            {
+                title: "Lloroso/a",
+                image: require('../assets/emojibutton8.png')
+            },
+        ]
     }
 
     async componentDidMount() {
@@ -73,7 +104,20 @@ export default class ProfileScreen extends React.Component {
     uploadImage = async (uri) => {
         const response = await fetch(uri);
         const blob = await response.blob();
-        return st.ref(('profile pictures/' + this.state.uid).put(blob));
+        return st.ref().child('profile pictures/' + this.state.uid).put(blob);
+    }
+
+    carouselRenderItem = ({ item, index }) => {
+        return (
+            <View style={styles.container_singlebutton}>
+                <EmotionButton setEmotion={() => this.setEmotion(item.title)}
+                    style={styles.emotionButtonStyle}
+                    emoji={item.image} />
+                <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
+                    {item.title}
+                </Text>
+            </View>
+        );
     }
 
     render() {
@@ -82,13 +126,13 @@ export default class ProfileScreen extends React.Component {
                 <View style={styles.container}>
                     <View style={styles.container1}>
                         <View style={styles.container1text}>
-                            <Text style={{ fontFamily: 'AvenirBold', fontSize: RFPercentage(4.7), color: '#4b3c74', marginBottom: '5%', marginTop: '15%' }}>
+                            <Text style={{ fontFamily: 'AvenirBold', fontSize: RFPercentage(4.7), color: '#4b3c74' }}>
                                 Tu perfil
                             </Text>
-                            <Text style={{ fontFamily: 'AvenirReg', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '5%' }}>
+                            <Text style={{ fontFamily: 'AvenirReg', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
                                 {this.props.route.params.username}
                             </Text>
-                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom:'5%' }}>
+                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
                                 {this.props.route.params.age}
                             </Text>
                             <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
@@ -111,68 +155,22 @@ export default class ProfileScreen extends React.Component {
                         <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
                             ¿Cómo te has sentido hoy?
                         </Text>
+
                     </View>
-                    <View style={styles.container_buttonrow}>
-                        <View style={styles.container_singlebutton}>
-                            <Inseguro setEmotion={() => this.setEmotion('Inseguro')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Inseguro/a
-                            </Text>
-                        </View>
-                        <View style={styles.container_singlebutton}>
-                            <Meh setEmotion={() => this.setEmotion('Meh')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Meh
-                            </Text>
-                        </View>
-                        <View style={styles.container_singlebutton}>
-                            <Triste setEmotion={() => this.setEmotion('Triste')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Triste
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={styles.container_buttonrow}>
-                        <View style={styles.container_singlebutton}>
-                            <Feliz setEmotion={() => this.setEmotion('Feliz')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Feliz
-                            </Text>
-                        </View>
-                        <View style={styles.container_singlebutton}>
-                            <Genial setEmotion={() => this.setEmotion('Genial')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Genial
-                            </Text>
-                        </View>
-                        <View style={styles.container_singlebutton}>
-                            <OMG setEmotion={() => this.setEmotion('OMG')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                OMG
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={styles.container_buttonrow}>
-                        <View style={styles.container_singlebutton}>
-                            <Enojado setEmotion={() => this.setEmotion('Enojado')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Enojado/a
-                            </Text>
-                        </View>
-                        <View style={styles.container_singlebutton}>
-                            <Lloroso setEmotion={() => this.setEmotion('Lloroso')}
-                                style={styles.emotionButtonStyle} />
-                            <Text style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#4b3c74' }}>
-                                Lloroso/a
-                            </Text>
-                        </View>
+                    <View style={styles.containerCarousel}>
+                        <Carousel
+                            ref={(c) => { this._carousel = c; }}
+                            data={this.state.carouselItems}
+                            renderItem={this.carouselRenderItem}
+                            sliderWidth={SCREEN_WIDTH}
+                            itemWidth={SCREEN_WIDTH/3}
+                            loop={true}
+                            firstItem={0}
+                            enableMomentum={true}
+                            autoplay={true}
+                            autoplayDelay={0}
+                            contentContainerCustomStyle={{alignItems:'center'}}
+                        />
                     </View>
                     <ImageBackground
                         style={styles.canvas}
@@ -211,23 +209,19 @@ const styles = StyleSheet.create({
         height: undefined,
         alignSelf: 'stretch',
         alignItems: 'center',
-    },
-    buttonContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent:'center',
     },
     container1: {
-        flex: 5,
+        flex: 3,
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop: StatusBar.currentHeight,
     },
     container1text: {
         flex: 1,
         flexDirection: 'column',
-        padding: 30,
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        paddingLeft: '5%',
     },
     container1img: {
         flex: 1,
@@ -235,23 +229,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     container2: {
-        flex: 1.6,
+        flex: 0,
         flexDirection: 'column',
         alignItems: 'center',
-        paddingBottom: '5%',
+        marginTop:'10%'
     },
-    container_buttonrow: {
-        flex: 2,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
+    containerCarousel: {
+        flex: 2.5,
+        justifyContent:'center',
+        alignItems:'center',
     },
     container_singlebutton: {
-        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
+        flex: 0
     },
     emotionButtonStyle: {
-        height: '60%',
+        width: '60%',
         aspectRatio: 1,
     },
     addimg: {
@@ -263,11 +257,11 @@ const styles = StyleSheet.create({
         overflow: 'hidden'
     },
     addimg2: {
-        height: '90%',
+        height: '80%',
         aspectRatio: 1,
         borderRadius: 10000,
         overflow: 'hidden',
-        marginTop: '6%'
+
     },
     pbackground: {
         height: '70%',
@@ -277,8 +271,7 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         alignItems: 'flex-end',
         justifyContent: 'flex-start',
-        marginTop: '20%',
-        marginRight: '20%'
+
     },
     pbackground2: {
         height: '70%',
@@ -287,9 +280,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#4f3976',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: "hidden",
-        marginTop: '20%',
-        marginRight: '20%'
+
     },
 });
 
