@@ -27,7 +27,7 @@ export default class RegisterScreen extends React.Component {
         genderTypes: [
             { label: 'Masculino', value: 0 },
             { label: 'Femenino', value: 1 }
-        ]
+        ],
     };
 
     handleRegisterPress = () => {
@@ -151,7 +151,7 @@ export default class RegisterScreen extends React.Component {
                                 onPress={(value) => {
                                     if (value == 0) {
                                         this.setState({ gender: 'Masculino' });
-                                    } else if (value == 0) {
+                                    } else if (value == 1) {
                                         this.setState({ gender: 'Femenino' });
                                     }
                                 }}

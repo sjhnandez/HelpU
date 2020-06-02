@@ -35,7 +35,7 @@ export default class ProfileScreen extends React.Component {
             'AvenirReg': require('../assets/fonts/AvenirNextLTPro-Regular.otf')
         });
         this.setState({ fontsLoaded: true });
-        st.ref().child('profile pictures/' + this.state.uid).getDownloadURL().then(img => {
+        st.ref(('profile pictures/' + this.state.uid)).getDownloadURL().then(img => {
             this.setState({ profilePicture: { uri: img } });
             this.setState({ pbackgroundStyle: styles.pbackground });
             this.setState({ pStyle: styles.addimg });
@@ -73,7 +73,7 @@ export default class ProfileScreen extends React.Component {
     uploadImage = async (uri) => {
         const response = await fetch(uri);
         const blob = await response.blob();
-        return st.ref().child('profile pictures/' + this.state.uid).put(blob);
+        return st.ref(('profile pictures/' + this.state.uid).put(blob));
     }
 
     render() {
@@ -90,6 +90,9 @@ export default class ProfileScreen extends React.Component {
                             </Text>
                             <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom:'5%' }}>
                                 {this.props.route.params.age}
+                            </Text>
+                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
+                                {this.props.route.params.company}
                             </Text>
                             <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
                                 Te sientes {this.state.emotionalState}

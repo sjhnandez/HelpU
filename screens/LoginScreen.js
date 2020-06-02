@@ -9,14 +9,18 @@ export default class SignInScreen extends React.Component {
     resetstate() {
         state = {
             email: '',
-            password: ''
+            password: '',
+            company: '',
+            isPsychologist: '',
         };
     }
 
     goToProfile = uid => {
         db.collection('users').doc(uid).get().then((user) => {
             let params = user.data();
-            params.uid=uid;
+            params.uid = uid;
+            params.company = this.state.company;
+            params.isPsychologist = this.state.isPsychologist;
             this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 1,
@@ -43,16 +47,26 @@ export default class SignInScreen extends React.Component {
             );
             console.log(error);
             return;
-        }).then((result) =>{
+        }).then((result) => {
             if (result) {
                 const user = result.user;
-                this.goToProfile(user.uid);
+                const splitEmail = user.email.split("@");
+                const companiesRef = db.collection('companies');
+                const query = companiesRef.where('email domain', '==', splitEmail[1]);
+                query.get().then((querySnapshot) => {
+                    querySnapshot.forEach((company) => {
+                        this.setState({ company: company.id });
+                        const psych = db.collection('companies').doc(company.id).collection('registeredPsychologists').doc(splitEmail[0]);
+                        psych.get().then((doc) => {
+                            if (doc.exists) {
+                                console.log('is psych!!');
+                                this.setState({ isPsychologist: true });
+                            }
+                        });
+                    });
+                }).then(()=>this.goToProfile(user.uid));
             }
         });
-    }
-
-    getUser = () => {
-        const user = db.collection('users').doc
     }
 
     render() {
@@ -150,7 +164,7 @@ const styles = StyleSheet.create({
         marginBottom: '13%',
     },
     buttonStyle: {
-        width:'50%',
-        aspectRatio: 921/231, 
+        width: '50%',
+        aspectRatio: 921 / 231,
     }
 });
