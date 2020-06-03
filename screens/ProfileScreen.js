@@ -164,8 +164,10 @@ export default class ProfileScreen extends React.Component {
                             renderItem={this.carouselRenderItem}
                             sliderWidth={SCREEN_WIDTH}
                             itemWidth={SCREEN_WIDTH/3}
-                            loop={true}
                             firstItem={0}
+                            initialScrollIndex={0}
+                            loop={true}
+                            loopClonesPerSide={4}
                             enableMomentum={true}
                             autoplay={true}
                             autoplayDelay={0}
