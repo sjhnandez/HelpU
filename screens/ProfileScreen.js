@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, Alert, Dimensions, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, Dimensions, StatusBar, Switch } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo'
 import EmotionButton from '../components/EmotionButton';
@@ -10,10 +10,12 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import { st } from '../config/Firebase';
 import Carousel from 'react-native-snap-carousel';
+import { moderateScale } from 'react-native-size-matters';
 
-const SCREEN_WIDTH=Dimensions.get("window").width;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default class ProfileScreen extends React.Component {
+
 
     state = {
         pbackgroundStyle: styles.pbackground2,
@@ -22,6 +24,7 @@ export default class ProfileScreen extends React.Component {
         emotionalState: '...',
         profilePicture: null,
         uid: null,
+        isAvailable: true,
         carouselItems: [
             {
                 title: "Inseguro/a",
@@ -36,7 +39,7 @@ export default class ProfileScreen extends React.Component {
                 image: require('../assets/emojibutton3.png')
             },
             {
-                title: "Feliz",
+                title: "Felíz",
                 image: require('../assets/emojibutton4.png')
             },
             {
@@ -68,7 +71,6 @@ export default class ProfileScreen extends React.Component {
         this.setState({ fontsLoaded: true });
         st.ref(('profile pictures/' + this.state.uid)).getDownloadURL().then(img => {
             this.setState({ profilePicture: { uri: img } });
-            this.setState({ pbackgroundStyle: styles.pbackground });
             this.setState({ pStyle: styles.addimg });
         }).catch(() => {
             this.setState({ profilePicture: require('../assets/plus.png') });
@@ -120,6 +122,109 @@ export default class ProfileScreen extends React.Component {
         );
     }
 
+    conditionalCompanyName = () => {
+        if (this.props.route.params.company) {
+            return (
+                <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
+                    {this.props.route.params.company}
+                </Text>
+            )
+        } else {
+            return null;
+        }
+    }
+
+    conditionalGreeting = () => {
+        if (this.props.route.params.isPsychologist) {
+            return (
+                <View style={styles.container2}>
+                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '1%' }}>
+                        ¿Te encuentras disponible
+                    </Text>
+                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
+                        para dar ayuda psicológica?
+                    </Text>
+                </View>
+            );
+        } else {
+            return (
+                <View style={styles.container2}>
+                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '1%' }}>
+                        Cuéntanos,
+                    </Text>
+                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
+                        ¿Cómo te has sentido hoy?
+                    </Text>
+                </View>
+            );
+        }
+    }
+
+    conditionalEmotion_Availability = () => {
+        if (this.props.route.params.isPsychologist) {
+            if (this.state.isAvailable) {
+                return (
+                    <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
+                        Disponible
+                    </Text>
+                );
+            } else {
+                return (
+                    <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
+                        No disponible
+                    </Text>
+                );
+            }
+        } else {
+            return (
+                <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
+                    Te sientes {this.state.emotionalState}
+                </Text>
+            )
+        }
+    }
+
+    conditionalInput = () => {
+        if (this.props.route.params.isPsychologist) {
+            return (
+                <View style={styles.containerInput}>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#4f3976" }}
+                        thumbColor={this.state.isAvailable ? "#ffbc31" : "#ffffff"}
+                        onValueChange={() => {
+                            this.setState({ isAvailable: !this.state.isAvailable });
+                        }}
+                        value={this.state.isAvailable}
+                        style={{
+                            transform: [
+                                { scaleX: moderateScale(1.5, 0.2) },
+                                { scaleY: moderateScale(1.5, 0.2) }
+                            ]
+                        }}
+                    />
+                </View>
+            );
+        } else {
+            return (
+
+                <View style={styles.containerInput}>
+                    <Carousel
+                        ref={(c) => { this._carousel = c; }}
+                        data={this.state.carouselItems}
+                        renderItem={this.carouselRenderItem}
+                        sliderWidth={SCREEN_WIDTH}
+                        itemWidth={SCREEN_WIDTH / 3}
+                        loopClonesPerSide={4}
+                        autoplay={true}
+                        horizontal={true}
+                        loop={true}
+                        contentContainerCustomStyle={{ alignItems: 'center' }}
+                    />
+                </View>
+            );
+        }
+    }
+
     render() {
         if (this.state.fontsLoaded) {
             return (
@@ -135,12 +240,8 @@ export default class ProfileScreen extends React.Component {
                             <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
                                 {this.props.route.params.age}
                             </Text>
-                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
-                                {this.props.route.params.company}
-                            </Text>
-                            <Text style={{ fontFamily: 'AvenirItalic', color: '#4b3c74', fontSize: RFPercentage(2.6) }}>
-                                Te sientes {this.state.emotionalState}
-                            </Text>
+                            <this.conditionalCompanyName />
+                            <this.conditionalEmotion_Availability />
                         </View>
                         <View style={styles.container1img}>
                             <View style={this.state.pbackgroundStyle} >
@@ -148,32 +249,8 @@ export default class ProfileScreen extends React.Component {
                             </View>
                         </View>
                     </View>
-                    <View style={styles.container2}>
-                        <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '1%' }}>
-                            Cuéntanos,
-                        </Text>
-                        <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
-                            ¿Cómo te has sentido hoy?
-                        </Text>
-
-                    </View>
-                    <View style={styles.containerCarousel}>
-                        <Carousel
-                            ref={(c) => { this._carousel = c; }}
-                            data={this.state.carouselItems}
-                            renderItem={this.carouselRenderItem}
-                            sliderWidth={SCREEN_WIDTH}
-                            itemWidth={SCREEN_WIDTH/3}
-                            firstItem={0}
-                            initialScrollIndex={0}
-                            loop={true}
-                            loopClonesPerSide={4}
-                            enableMomentum={true}
-                            autoplay={true}
-                            autoplayDelay={0}
-                            contentContainerCustomStyle={{alignItems:'center'}}
-                        />
-                    </View>
+                    <this.conditionalGreeting />
+                    <this.conditionalInput />
                     <ImageBackground
                         style={styles.canvas}
                         source={require('../assets/profilebottombackground.png')}
@@ -211,7 +288,7 @@ const styles = StyleSheet.create({
         height: undefined,
         alignSelf: 'stretch',
         alignItems: 'center',
-        justifyContent:'center',
+        justifyContent: 'center',
     },
     container1: {
         flex: 3,
@@ -234,12 +311,12 @@ const styles = StyleSheet.create({
         flex: 0,
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop:'10%'
+        marginTop: '10%'
     },
-    containerCarousel: {
+    containerInput: {
         flex: 2.5,
-        justifyContent:'center',
-        alignItems:'center',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     container_singlebutton: {
         justifyContent: 'center',
@@ -251,10 +328,8 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     addimg: {
-        height: '95%',
+        height: '90%',
         aspectRatio: 1,
-        marginRight: '2%',
-        marginTop: '2%',
         borderRadius: 10000,
         overflow: 'hidden'
     },
@@ -263,16 +338,6 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
         borderRadius: 10000,
         overflow: 'hidden',
-
-    },
-    pbackground: {
-        height: '70%',
-        borderRadius: 10000,
-        aspectRatio: 1,
-        backgroundColor: '#4f3976',
-        overflow: "hidden",
-        alignItems: 'flex-end',
-        justifyContent: 'flex-start',
 
     },
     pbackground2: {

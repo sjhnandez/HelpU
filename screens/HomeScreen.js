@@ -40,13 +40,12 @@ const styles = StyleSheet.create({
     bottomContainer: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginBottom:'10%',
+        justifyContent: 'space-evenly',
     },
     buttonStyle: {
         width:'50%',
+        height:undefined,
         aspectRatio: 921/231, 
-        marginVertical:'3%'
     }
 });
 

@@ -8,7 +8,7 @@ const login = props => {
             <Image 
                 style = {{ flex: 1, height: undefined, width: undefined }}
                 source={require('../assets/login.png')}
-                resizeMode='stretch'
+                resizeMode='cover'
             />
         </TouchableOpacity>
     );

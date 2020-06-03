@@ -12,7 +12,7 @@
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
@@ -25,6 +25,10 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.helpltd.helpu",
       "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.helpltd.helpu",
+      "versionCode": 1
     },
     "description": ""
   }

@@ -6,14 +6,12 @@ import { CommonActions } from '@react-navigation/native';
 import { RFPercentage } from "react-native-responsive-fontsize";
 
 export default class SignInScreen extends React.Component {
-    resetstate() {
-        state = {
-            email: '',
-            password: '',
-            company: '',
-            isPsychologist: '',
-        };
-    }
+    state = {
+        email: null,
+        password: null,
+        company: null,
+        isPsychologist: false,
+    };
 
     goToProfile = uid => {
         db.collection('users').doc(uid).get().then((user) => {
@@ -64,13 +62,12 @@ export default class SignInScreen extends React.Component {
                             }
                         });
                     });
-                }).then(()=>this.goToProfile(user.uid));
+                }).then(() => this.goToProfile(user.uid));
             }
         });
     }
 
     render() {
-        this.resetstate();
         return (
             <View style={styles.container}>
                 <View style={styles.topContainer}>

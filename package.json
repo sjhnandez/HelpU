@@ -27,7 +27,8 @@
     "react-native-safe-area-context": "0.7.3",
     "react-native-screens": "~2.2.0",
     "react-native-simple-radio-button": "^2.7.4",
-    "react-native-snap-carousel": "^3.9.1",
+    "react-native-size-matters": "^0.3.0",
+    "react-native-snap-carousel": "https://github.com/archriss/react-native-snap-carousel.git#4.0.0-beta.x",
     "react-native-vector-icons": "^6.6.0",
     "react-native-web": "~0.11.7"
   },

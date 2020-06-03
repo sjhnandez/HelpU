@@ -4906,7 +4906,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@15.7.2, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -5090,12 +5090,16 @@ react-native-simple-radio-button@^2.7.4:
   resolved "https://registry.yarnpkg.com/react-native-simple-radio-button/-/react-native-simple-radio-button-2.7.4.tgz#86e2dbe8af9e6bf60eee088f60466f7a975e7758"
   integrity sha512-QOZNmJUn0ViBGU+at7wAG/uGzd5PfXi0kMHr9lfTCLXknW/f9f2fOVjxjdHvOCdf/zA/eMJBjGjtusSDzQf1+w==
 
-react-native-snap-carousel@^3.9.1:
-  version "3.9.1"
-  resolved "https://registry.yarnpkg.com/react-native-snap-carousel/-/react-native-snap-carousel-3.9.1.tgz#6fd9bd8839546c2c6043a41d2035afbc6fe0443e"
-  integrity sha512-xWEGusacIgK1YaDXLi7Gao2+ISLoGPVEBR8fcMf4tOOJQufutlNwkoLu0l6B8Qgsrre0nTxoVZikRgGRDWlLaQ==
+react-native-size-matters@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-size-matters/-/react-native-size-matters-0.3.0.tgz#0692e324a189884819b570c4cab24d27ecd4311d"
+  integrity sha512-PuwA07mr3woQPFJXo3FwlFwpe6bb2LCb20sDZ4JWMpGBtmppq4sKH4GLgS6Sw+GkN0sSOEXGZLaOsHZYFY9hJg==
+
+"react-native-snap-carousel@https://github.com/archriss/react-native-snap-carousel.git#4.0.0-beta.x":
+  version "4.0.0-beta.4"
+  resolved "https://github.com/archriss/react-native-snap-carousel.git#912c085d337f20384c66d553e71b455661167998"
   dependencies:
-    prop-types "^15.6.1"
+    prop-types "15.7.2"
     react-addons-shallow-compare "15.6.2"
 
 react-native-vector-icons@^6.6.0:
