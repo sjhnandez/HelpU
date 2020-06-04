@@ -33,18 +33,6 @@ export default class ProfileScreen extends React.Component {
         updateTimer: null,
         carouselItems: [
             {
-                title: "Inseguro/a",
-                image: require('../assets/emojibutton1.png')
-            },
-            {
-                title: "Meh",
-                image: require('../assets/emojibutton2.png')
-            },
-            {
-                title: "Triste",
-                image: require('../assets/emojibutton3.png')
-            },
-            {
                 title: "Felíz",
                 image: require('../assets/emojibutton4.png')
             },
@@ -56,6 +44,19 @@ export default class ProfileScreen extends React.Component {
                 title: "OMG",
                 image: require('../assets/emojibutton6.png')
             },
+            {
+                title: "Inseguro/a",
+                image: require('../assets/emojibutton1.png')
+            },
+            {
+                title: "Meh",
+                image: require('../assets/emojibutton2.png')
+            },
+            {
+                title: "Triste",
+                image: require('../assets/emojibutton3.png')
+            },
+
             {
                 title: "Enojado/a",
                 image: require('../assets/emojibutton7.png')
@@ -271,12 +272,8 @@ export default class ProfileScreen extends React.Component {
                         renderItem={this.carouselRenderItem}
                         sliderWidth={SCREEN_WIDTH}
                         itemWidth={SCREEN_WIDTH / 3}
-                        initialScrollIndex={this.state.carouselItems.length - 4}
-                        firstItem={this.state.carouselItems.length - 4}
-                        loopClonesPerSide={4}
                         autoplay={true}
-                        horizontal={true}
-                        loop={true}
+                        autoplayInterval={2000}
                         contentContainerCustomStyle={{ alignItems: 'center' }}
                     />
                 </View>
