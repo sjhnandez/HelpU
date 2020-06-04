@@ -7,7 +7,10 @@ const addimg = props => {
             onPress={props.pickimg}
         >
             <Image
-                style={{flex:1, width:undefined, height:undefined}}
+                style={{
+                    flex: 1, 
+                    aspectRatio:1,
+                }}
                 source={props.img}
                 resizeMode='stretch'
             />

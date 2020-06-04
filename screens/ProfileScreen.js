@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, Dimensions, StatusBar, Switch } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, Dimensions, StatusBar, Switch, AppState } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo'
 import EmotionButton from '../components/EmotionButton';
@@ -9,22 +9,28 @@ import AddImg from '../components/AddImg';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import { st } from '../config/Firebase';
+import { db } from '../config/Firebase';
 import Carousel from 'react-native-snap-carousel';
 import { moderateScale } from 'react-native-size-matters';
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const UPDATE_DELAY = 2000;
 
 export default class ProfileScreen extends React.Component {
 
 
     state = {
-        pbackgroundStyle: styles.pbackground2,
-        pStyle: styles.addimg2,
-        fontsLoaded: false,
+        appState: AppState.currentState,
+        userDBref: null,
+        psychDBref: null,
+        loadedProfileData: false,
+        fontsAndPictureLoaded: false,
         emotionalState: '...',
         profilePicture: null,
         uid: null,
-        isAvailable: true,
+        isAvailable: false,
+        status: null,
+        updateTimer: null,
         carouselItems: [
             {
                 title: "Inseguro/a",
@@ -62,23 +68,72 @@ export default class ProfileScreen extends React.Component {
     }
 
     async componentDidMount() {
+        let psychref;
+        if (this.props.route.params.isPsychologist && this.props.route.params.company) {
+            psychref = db.collection('companies').doc(this.props.route.params.company).collection('registeredPsychologists').doc(this.props.route.params.email.split('@')[0]);
+        } else if (this.props.route.params.isPsychologist) {
+            psychref = db.collection('registeredPsychologists').doc(this.props.route.params.uid);
+        }
+        this.setState({ psychDBref: psychref }, () => {
+            if (this.props.route.params.isPsychologist) {
+                this.state.psychDBref.get().then((psych) => {
+                    let data = psych.data();
+                    this.setState({ isAvailable: data.isAvailable, status: data.status }, () => this.setState({ loadedProfileData: true }));
+                })
+            }
+        });
+        this.setState({ userDBref: db.collection('users').doc(this.props.route.params.uid) }, () => {
+            if (!this.props.route.params.isPsychologist) {
+                this.state.userDBref.get().then((user) => {
+                    let data = user.data();
+                    this.setState({ emotionalState: data.emotionalState }, () => this.setState({ loadedProfileData: true }));
+                })
+            }
+        });
+        AppState.addEventListener('change', this.handleAppStateChange);
         this.setState({ uid: this.props.route.params.uid });
         await Font.loadAsync({
             'AvenirBold': require('../assets/fonts/AvenirNextLTPro-Bold.otf'),
             'AvenirItalic': require('../assets/fonts/AvenirNextLTPro-It.otf'),
             'AvenirReg': require('../assets/fonts/AvenirNextLTPro-Regular.otf')
         });
-        this.setState({ fontsLoaded: true });
         st.ref(('profile pictures/' + this.state.uid)).getDownloadURL().then(img => {
-            this.setState({ profilePicture: { uri: img } });
-            this.setState({ pStyle: styles.addimg });
+            this.setState({ profilePicture: { uri: img } }, () => this.setState({ fontsAndPictureLoaded: true }));
         }).catch(() => {
-            this.setState({ profilePicture: require('../assets/plus.png') });
+            this.setState({ profilePicture: require('../assets/plus.png') }, () => this.setState({ fontsAndPictureLoaded: true }));
         });
     }
 
-    setEmotion = (emotion) => {
-        this.setState({ emotionalState: emotion });
+    async componentWillUnmount() {
+        this.manageInputUpdates();
+        AppState.removeEventListener('change', this.handleAppStateChange)
+    }
+
+    manageInputUpdates = async () => {
+        clearInterval(this.state.updateTimer);
+        console.log('Uploading changes...')
+        if (this.props.route.params.isPsychologist) {
+            this.state.psychDBref.update({ isAvailable: this.state.isAvailable }).catch(error => {
+                console.error('Error writing document', error);
+            });
+        } else {
+            this.state.userDBref.update({ emotionalState: this.state.emotionalState })
+        }
+
+    }
+
+    handleAppStateChange = (nextAppState) => {
+        if (this.state.appState.match(/active/) && (nextAppState === 'background' || nextAppState === 'inactive')) {
+            this.manageInputUpdates();
+        }
+        this.setState({ appState: nextAppState });
+    }
+
+    setEmotion = async (emotion) => {
+        this.setState({ emotionalState: emotion }, () => {
+            clearInterval(this.state.updateTimer);
+            this.setState({ updateTimer: setInterval(this.manageInputUpdates, UPDATE_DELAY) });
+        });
     }
 
     pickImg = async () => {
@@ -189,12 +244,15 @@ export default class ProfileScreen extends React.Component {
             return (
                 <View style={styles.containerInput}>
                     <Switch
+                        value={this.state.isAvailable}
                         trackColor={{ false: "#767577", true: "#4f3976" }}
                         thumbColor={this.state.isAvailable ? "#ffbc31" : "#ffffff"}
                         onValueChange={() => {
-                            this.setState({ isAvailable: !this.state.isAvailable });
+                            this.setState({ isAvailable: !this.state.isAvailable }, () => {
+                                clearInterval(this.state.updateTimer);
+                                this.setState({ updateTimer: setInterval(this.manageInputUpdates, UPDATE_DELAY) });
+                            });
                         }}
-                        value={this.state.isAvailable}
                         style={{
                             transform: [
                                 { scaleX: moderateScale(1.5, 0.2) },
@@ -206,7 +264,6 @@ export default class ProfileScreen extends React.Component {
             );
         } else {
             return (
-
                 <View style={styles.containerInput}>
                     <Carousel
                         ref={(c) => { this._carousel = c; }}
@@ -214,6 +271,8 @@ export default class ProfileScreen extends React.Component {
                         renderItem={this.carouselRenderItem}
                         sliderWidth={SCREEN_WIDTH}
                         itemWidth={SCREEN_WIDTH / 3}
+                        initialScrollIndex={this.state.carouselItems.length - 4}
+                        firstItem={this.state.carouselItems.length - 4}
                         loopClonesPerSide={4}
                         autoplay={true}
                         horizontal={true}
@@ -226,7 +285,7 @@ export default class ProfileScreen extends React.Component {
     }
 
     render() {
-        if (this.state.fontsLoaded) {
+        if (this.state.fontsAndPictureLoaded && this.state.loadedProfileData) {
             return (
                 <View style={styles.container}>
                     <View style={styles.container1}>
@@ -244,9 +303,7 @@ export default class ProfileScreen extends React.Component {
                             <this.conditionalEmotion_Availability />
                         </View>
                         <View style={styles.container1img}>
-                            <View style={this.state.pbackgroundStyle} >
-                                <AddImg style={this.state.pStyle} pickimg={this.pickImg} img={this.state.profilePicture} resizeMode='contain' />
-                            </View>
+                            <AddImg style={styles.addimg} pickimg={this.pickImg} img={this.state.profilePicture} resizeMode='contain' />
                         </View>
                     </View>
                     <this.conditionalGreeting />
@@ -328,26 +385,13 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     addimg: {
-        height: '90%',
-        aspectRatio: 1,
-        borderRadius: 10000,
-        overflow: 'hidden'
-    },
-    addimg2: {
-        height: '80%',
+        height: '75%',
         aspectRatio: 1,
         borderRadius: 10000,
         overflow: 'hidden',
-
-    },
-    pbackground2: {
-        height: '70%',
-        borderRadius: 10000,
-        aspectRatio: 1,
+        borderWidth: 5,
+        borderColor: '#4f3976',
         backgroundColor: '#4f3976',
-        justifyContent: 'center',
-        alignItems: 'center',
-
     },
 });
 
