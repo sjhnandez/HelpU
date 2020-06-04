@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Image, Dimensions, ImageBackground, TextInput, Alert, Text } from 'react-native';
+import { StyleSheet, View, Image, Dimensions, ImageBackground, TextInput, Alert, Text, StatusBar } from 'react-native';
 import Firebase, { db } from '../config/Firebase';
 import Register from '../components/Register';
 import { CommonActions } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import RadioForm from 'react-native-simple-radio-button';
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { YellowBox } from 'react-native';
 import _ from 'lodash';
+import { CheckBox } from 'react-native-elements'
 
 YellowBox.ignoreWarnings(['Setting a timer']);
 const _console = _.clone(console);
@@ -16,27 +17,32 @@ console.warn = message => {
     }
 };
 
+const SCREEN_HEIGHT=Dimensions.get('window').height;
+
 
 export default class RegisterScreen extends React.Component {
     state = {
         username: '',
-        age: '',
-        gender: 'Masculino',
+        age: null,
+        isMale: true,
         email: '',
         password: '',
-        genderTypes: [
-            { label: 'Masculino', value: 0 },
-            { label: 'Femenino', value: 1 }
-        ],
+        isPsychologist: false,
     };
 
     handleRegisterPress = () => {
         let component = this;
         const navigation = this.props.navigation;
         try {
-            let { username, age, gender, email, password } = this.state;
-            if (username == null || age == null || gender == null || email == null || password == null) {
+            let { username, age, isMale, email, password } = this.state;
+            if (username == null || age == null || isMale == null || email == null || password == null) {
                 throw new Error();
+            }
+            let gender;
+            if (!isMale) {
+                gender = 'Female';
+            } else {
+                gender = 'Male';
             }
             Firebase.auth().createUserWithEmailAndPassword(email, password)
                 .catch(function (error) {
@@ -49,7 +55,13 @@ export default class RegisterScreen extends React.Component {
                         user.updateProfile({
                             displayName: username,
                         });
-                        db.collection('users').doc(user.uid).set({
+                        let dbref;
+                        if (this.state.isPsychologist) {
+                            dbref = 'registeredPsychologists';
+                        } else {
+                            dbref = 'users';
+                        }
+                        db.collection(dbref).doc(user.uid).set({
                             username,
                             age,
                             gender,
@@ -111,71 +123,73 @@ export default class RegisterScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.topContainer}>
-                    <ImageBackground
-                        style={styles.canvas}
-                        source={require('../assets/registerbackground.png')}
-                        resizeMode='stretch'
-                    >
-                        <Image
-                            style={{ height: '4%', aspectRatio: 820 / 100, marginTop: '13%' }}
-                            source={require('../assets/register_header.png')}
-                        />
-                        <TextInput
-                            style={styles.inputBox1}
-                            onChangeText={username => this.setState({ username })}
-                            placeholder='Nombre'
-                            placeholderTextColor='#4b3c74'
-                        />
-                        <TextInput
-                            style={styles.inputBox4}
-                            onChangeText={age => this.setState({ age })}
-                            placeholder='Edad'
-                            placeholderTextColor='#4b3c74'
-                            keyboardType="numeric"
-                            contextMenuHidden={true}
-                        />
-                        <View style={styles.radioButtonContainer}>
-                            <Text style={{ fontSize: RFPercentage(2.5), color: "#4b3c74", marginBottom: '5%' }}>
-                                Género:
+                <ImageBackground
+                    style={styles.canvas}
+                    source={require('../assets/registerbackground.png')}
+                    resizeMode='stretch'
+                >
+                    <Image
+                        style={{ height:'5%', aspectRatio: 820 / 100, marginTop: StatusBar.currentHeight, marginBottom:'5%'}}
+                        source={require('../assets/register_header.png')}
+                    />
+                    <TextInput
+                        style={styles.inputBox}
+                        onChangeText={username => this.setState({ username })}
+                        placeholder='Nombre'
+                        placeholderTextColor='#4f3976'
+                    />
+                    <TextInput
+                        style={styles.inputBox}
+                        onChangeText={age => this.setState({ age })}
+                        placeholder='Edad'
+                        placeholderTextColor='#4f3976'
+                        keyboardType="numeric"
+                        contextMenuHidden={true}
+                    />
+                    <View style={{ flex: 0, width: '70%', flexDirection: 'row' }}>
+                        <Text style={{ fontSize: RFPercentage(2.5), color: "#4f3976", textAlign: 'left' }}>
+                            Género:
                             </Text>
-                            <RadioForm
-                                radio_props={this.state.genderTypes}
-                                initial={0}
-                                formHorizontal={true}
-                                labelHorizontal={true}
-                                buttonColor={'#2196f3'}
-                                animation={true}
-                                buttonSize={15}
-                                labelStyle={{ fontSize: RFPercentage(2.5), color: '#4b3c74', marginHorizontal: '4%' }}
-                                onPress={(value) => {
-                                    if (value == 0) {
-                                        this.setState({ gender: 'Masculino' });
-                                    } else if (value == 1) {
-                                        this.setState({ gender: 'Femenino' });
-                                    }
-                                }}
-                            />
-                        </View>
-                        <TextInput
-                            style={styles.inputBox3}
-                            onChangeText={email => this.setState({ email })}
-                            placeholder='Correo electrónico'
-                            placeholderTextColor='#4b3c74'
-                            autoCapitalize='none'
-                            keyboardType='email-address'
-                        />
-                        <TextInput
-                            style={styles.inputBox2}
-                            onChangeText={password => this.setState({ password })}
-                            placeholder='Contraseña'
-                            placeholderTextColor='#4b3c74'
-                            autoCapitalize='none'
-                            secureTextEntry={true}
-                        />
-                        <Register style={styles.buttonStyle} navigate={() => this.handleRegisterPress()} />
-                    </ImageBackground>
-                </View>
+                    </View>
+                    <View style={styles.radioButtonContainer}>
+                        <CheckBox title="Masculino" checked={this.state.isMale}
+                            onPress={() => this.setState({ isMale: true })}
+                            containerStyle={{ backgroundColor: 'transparent', borderWidth: 0, padding: 0, margin: 0 }}
+                            textStyle={{ color: '#4f3976' }}
+                            checkedIcon='dot-circle-o'
+                            uncheckedIcon='circle-o'
+                            checkedColor='#4f3976' />
+                        <CheckBox title="Femenino" checked={!this.state.isMale}
+                            onPress={() => this.setState({ isMale: false })}
+                            containerStyle={{ backgroundColor: 'transparent', borderWidth: 0, padding: 0, margin: 0 }}
+                            textStyle={{ color: '#4f3976' }}
+                            checkedIcon='dot-circle-o'
+                            uncheckedIcon='circle-o'
+                            checkedColor='#4f3976' />
+                    </View>
+                    <TextInput
+                        style={styles.inputBox}
+                        onChangeText={email => this.setState({ email })}
+                        placeholder='Correo electrónico'
+                        placeholderTextColor='#4f3976'
+                        autoCapitalize='none'
+                        keyboardType='email-address'
+                    />
+                    <TextInput
+                        style={styles.inputBox}
+                        onChangeText={password => this.setState({ password })}
+                        placeholder='Contraseña'
+                        placeholderTextColor='#4f3976'
+                        autoCapitalize='none'
+                        secureTextEntry={true}
+                    />
+                    <CheckBox title="¿Te registras como psicólogo?" checked={this.state.isPsychologist}
+                        onPress={() => this.setState({ isPsychologist: !this.state.isPsychologist })}
+                        containerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}
+                        textStyle={{ color: '#4f3976' }}
+                        checkedColor='#4f3976' />
+                    <Register style={styles.buttonStyle} navigate={() => this.handleRegisterPress()} />
+                </ImageBackground>
                 <View style={styles.bottomContainer}>
                     <Image
                         style={{ height: '60%', aspectRatio: 311 / 128, marginTop: '3%' }}
@@ -195,68 +209,28 @@ const styles = StyleSheet.create({
         backgroundColor: '#4f3976',
     },
     canvas: {
-        flex: 1,
-        flexDirection: 'column',
-        width: undefined,
-        height: undefined,
+        flexDirection:'column',
+        height: SCREEN_HEIGHT*0.9,
+        width:'100%',
         alignSelf: 'stretch',
         alignItems: 'center',
-
-    },
-    topContainer: {
-        marginHorizontal: 0,
-        width: '100%',
-        height: Dimensions.get('window').height - (Dimensions.get('window').height / 10),
-        flexDirection: 'column',
-        alignItems: 'center',
+        paddingBottom: 150,
+        justifyContent:'space-evenly'
     },
     bottomContainer: {
         width: '100%',
-        height: Dimensions.get('window').height / 10,
+        height: SCREEN_HEIGHT*0.1,
         alignItems: 'center',
         flexDirection: 'column',
     },
     radioButtonContainer: {
         width: '71%',
-        flexDirection: 'column',
-        justifyContent: 'flex-end'
+        flexDirection: 'row',
+        justifyContent: 'center',
+        flex: 0,
     },
-    inputBox1: {
-        marginTop: '13%',
+    inputBox: {
         width: '70%',
-        margin: '2.6%',
-        fontSize: RFPercentage(2.5),
-        color: "#4b3c74",
-        borderColor: '#4b3c74',
-        borderBottomWidth: 1,
-        textAlign: 'left'
-    },
-    inputBox2: {
-        marginTop: '1.3%',
-        width: '70%',
-        margin: '2.6%',
-        fontSize: RFPercentage(2.5),
-        color: "#4b3c74",
-        borderColor: '#4b3c74',
-        borderBottomWidth: 1,
-        textAlign: 'left',
-        marginBottom: '13%',
-    },
-    inputBox3: {
-        marginTop: '3%',
-        width: '70%',
-        margin: '2.6%',
-        fontSize: RFPercentage(2.5),
-        color: "#4b3c74",
-        borderColor: '#4b3c74',
-        borderBottomWidth: 1,
-        textAlign: 'left',
-    },
-    inputBox4: {
-        marginTop: '1.3%',
-        marginBottom: '4%',
-        width: '70%',
-        margin: '2.6%',
         fontSize: RFPercentage(2.5),
         color: "#4b3c74",
         borderColor: '#4b3c74',

@@ -69,40 +69,10 @@ export default class ProfileScreen extends React.Component {
     }
 
     async componentDidMount() {
-        let psychref;
-        if (this.props.route.params.isPsychologist && this.props.route.params.company) {
-            psychref = db.collection('companies').doc(this.props.route.params.company).collection('registeredPsychologists').doc(this.props.route.params.email.split('@')[0]);
-        } else if (this.props.route.params.isPsychologist) {
-            psychref = db.collection('registeredPsychologists').doc(this.props.route.params.uid);
-        }
-        this.setState({ psychDBref: psychref }, () => {
-            if (this.props.route.params.isPsychologist) {
-                this.state.psychDBref.get().then((psych) => {
-                    let data = psych.data();
-                    this.setState({ isAvailable: data.isAvailable, status: data.status }, () => this.setState({ loadedProfileData: true }));
-                })
-            }
-        });
-        this.setState({ userDBref: db.collection('users').doc(this.props.route.params.uid) }, () => {
-            if (!this.props.route.params.isPsychologist) {
-                this.state.userDBref.get().then((user) => {
-                    let data = user.data();
-                    this.setState({ emotionalState: data.emotionalState }, () => this.setState({ loadedProfileData: true }));
-                })
-            }
-        });
         AppState.addEventListener('change', this.handleAppStateChange);
         this.setState({ uid: this.props.route.params.uid });
-        await Font.loadAsync({
-            'AvenirBold': require('../assets/fonts/AvenirNextLTPro-Bold.otf'),
-            'AvenirItalic': require('../assets/fonts/AvenirNextLTPro-It.otf'),
-            'AvenirReg': require('../assets/fonts/AvenirNextLTPro-Regular.otf')
-        });
-        st.ref(('profile pictures/' + this.state.uid)).getDownloadURL().then(img => {
-            this.setState({ profilePicture: { uri: img } }, () => this.setState({ fontsAndPictureLoaded: true }));
-        }).catch(() => {
-            this.setState({ profilePicture: require('../assets/plus.png') }, () => this.setState({ fontsAndPictureLoaded: true }));
-        });
+        await this.loadUserData();
+        await this.loadFontsAndPicture();
     }
 
     async componentWillUnmount() {
@@ -110,15 +80,51 @@ export default class ProfileScreen extends React.Component {
         AppState.removeEventListener('change', this.handleAppStateChange)
     }
 
+    loadUserData = async () => {
+        if (this.props.route.params.isPsychologist) {
+            let psychref = db.collection('registeredPsychologists').doc(this.props.route.params.uid);
+            this.setState({ psychDBref: psychref }, () => {
+                this.state.psychDBref.get().then((psych) => {
+                    let data = psych.data();
+                    this.setState({ isAvailable: data.isAvailable, status: data.status }, () => this.setState({ loadedProfileData: true }));
+                })
+            });
+        } else {
+            this.setState({ userDBref: db.collection('users').doc(this.props.route.params.uid) }, () => {
+                this.state.userDBref.get().then((user) => {
+                    let data = user.data();
+                    this.setState({ emotionalState: data.emotionalState }, () => this.setState({ loadedProfileData: true }));
+                })
+            });
+        }
+    }
+
+    loadFontsAndPicture = async () => {
+        await Font.loadAsync({
+            'AvenirBold': require('../assets/fonts/AvenirNextLTPro-Bold.otf'),
+            'AvenirItalic': require('../assets/fonts/AvenirNextLTPro-It.otf'),
+            'AvenirReg': require('../assets/fonts/AvenirNextLTPro-Regular.otf')
+        });
+        await st.ref(('profile pictures/' + this.state.uid)).getDownloadURL().then(img => {
+            this.setState({ profilePicture: { uri: img } }, () => this.setState({ fontsAndPictureLoaded: true }));
+        }).catch(() => {
+            this.setState({ profilePicture: require('../assets/plus.png') }, () => this.setState({ fontsAndPictureLoaded: true }));
+        });
+    }
+
     manageInputUpdates = async () => {
         clearInterval(this.state.updateTimer);
         console.log('Uploading changes...')
         if (this.props.route.params.isPsychologist) {
-            this.state.psychDBref.update({ isAvailable: this.state.isAvailable }).catch(error => {
-                console.error('Error writing document', error);
-            });
+            if (this.state.isAvailable!=null) {
+                this.state.psychDBref.update({ isAvailable: this.state.isAvailable }).catch(error => {
+                    console.error('Error writing document', error);
+                });
+            }
         } else {
-            this.state.userDBref.update({ emotionalState: this.state.emotionalState })
+            if (this.state.emotionalState) {
+                this.state.userDBref.update({ emotionalState: this.state.emotionalState })
+            }
         }
 
     }

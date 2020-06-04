@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, TextInput, View, Image, ImageBackground, Dimensions, Alert } from 'react-native';
+import { StyleSheet, TextInput, View, Image, ImageBackground, Dimensions, Alert, StatusBar } from 'react-native';
 import Login from '../components/Login';
 import Firebase, { db } from '../config/Firebase';
 import { CommonActions } from '@react-navigation/native';
 import { RFPercentage } from "react-native-responsive-fontsize";
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default class SignInScreen extends React.Component {
     state = {
@@ -11,14 +13,22 @@ export default class SignInScreen extends React.Component {
         password: null,
         company: null,
         isPsychologist: false,
+        isCompanyPsychologist:false,
     };
 
     goToProfile = uid => {
-        db.collection('users').doc(uid).get().then((user) => {
+        let dbref;
+        if (this.state.isPsychologist) {
+            dbref = 'registeredPsychologists';
+        } else {
+            dbref = 'users';
+        }
+        db.collection(dbref).doc(uid).get().then((user) => {
             let params = user.data();
             params.uid = uid;
             params.company = this.state.company;
             params.isPsychologist = this.state.isPsychologist;
+            params.isCompanyPsychologist=this.state.isCompanyPsychologist;
             this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 1,
@@ -45,24 +55,30 @@ export default class SignInScreen extends React.Component {
             );
             console.log(error);
             return;
-        }).then((result) => {
+        }).then(async(result) => {
             if (result) {
                 const user = result.user;
+                const psychCollectionRef = db.collection('registeredPsychologists');
+                await psychCollectionRef.doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        this.setState({ isPsychologist: true });
+                    }
+                });
                 const splitEmail = user.email.split("@");
                 const companiesRef = db.collection('companies');
                 const query = companiesRef.where('email domain', '==', splitEmail[1]);
                 query.get().then((querySnapshot) => {
-                    querySnapshot.forEach((company) => {
+                    const company = querySnapshot.docs[0];
+                    if (company) {
                         this.setState({ company: company.id });
                         const psych = db.collection('companies').doc(company.id).collection('registeredPsychologists').doc(splitEmail[0]);
                         psych.get().then((doc) => {
                             if (doc.exists) {
-                                console.log('is psych!!');
-                                this.setState({ isPsychologist: true });
+                                this.setState({ isCompanyPsychologist: true }, () => this.goToProfile(user.uid));
                             }
                         });
-                    });
-                }).then(() => this.goToProfile(user.uid));
+                    }
+                }).then(this.goToProfile(user.uid));
             }
         });
     }
@@ -70,35 +86,33 @@ export default class SignInScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.topContainer}>
-                    <ImageBackground
-                        style={styles.canvas}
-                        source={require('../assets/loginbackground.png')}
-                        resizeMode='stretch'
-                    >
-                        <Image
-                            style={{ height: '4%', aspectRatio: 828 / 103, marginTop: '42%' }}
-                            source={require('../assets/login_header.png')}
-                        />
-                        <TextInput
-                            style={styles.inputBox1}
-                            onChangeText={email => this.setState({ email })}
-                            placeholder='Email'
-                            placeholderTextColor='#e6b637'
-                            autoCapitalize='none'
-                            keyboardType="email-address"
-                        />
-                        <TextInput
-                            style={styles.inputBox2}
-                            onChangeText={password => this.setState({ password })}
-                            placeholder='Contraseña'
-                            placeholderTextColor='#e6b637'
-                            autoCapitalize='none'
-                            secureTextEntry={true}
-                        />
-                        <Login style={styles.buttonStyle} navigate={() => this.handleLoginPress()} />
-                    </ImageBackground>
-                </View>
+                <ImageBackground
+                    style={styles.canvas}
+                    source={require('../assets/loginbackground.png')}
+                    resizeMode='stretch'
+                >
+                    <Image
+                        style={{ height: '4%', aspectRatio: 828 / 103, marginTop: StatusBar.currentHeight }}
+                        source={require('../assets/login_header.png')}
+                    />
+                    <TextInput
+                        style={styles.inputBox}
+                        onChangeText={email => this.setState({ email })}
+                        placeholder='Email'
+                        placeholderTextColor='#e6b637'
+                        autoCapitalize='none'
+                        keyboardType="email-address"
+                    />
+                    <TextInput
+                        style={styles.inputBox}
+                        onChangeText={password => this.setState({ password })}
+                        placeholder='Contraseña'
+                        placeholderTextColor='#e6b637'
+                        autoCapitalize='none'
+                        secureTextEntry={true}
+                    />
+                    <Login style={styles.buttonStyle} navigate={() => this.handleLoginPress()} />
+                </ImageBackground>
                 <View style={styles.bottomContainer}>
                     <Image
                         style={{ height: '60%', aspectRatio: 311 / 128, marginTop: '3%' }}
@@ -118,47 +132,28 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffedd2',
     },
     canvas: {
-        flex: 1,
         flexDirection: 'column',
-        width: undefined,
-        height: undefined,
+        width: '100%',
+        height: SCREEN_HEIGHT * 0.9,
         alignSelf: 'stretch',
         alignItems: 'center',
+        justifyContent: 'space-evenly',
+        paddingBottom: 150,
 
-    },
-    topContainer: {
-        marginHorizontal: 0,
-        width: '100%',
-        height: Dimensions.get('window').height - (Dimensions.get('window').height / 10),
-        flexDirection: 'column',
-        alignItems: 'center',
     },
     bottomContainer: {
         width: '100%',
-        height: Dimensions.get('window').height / 10,
+        height: SCREEN_HEIGHT * 0.1,
         alignItems: 'center',
         flexDirection: 'column',
     },
-    inputBox1: {
-        marginTop: '13%',
+    inputBox: {
         width: '70%',
-        margin: '2.6%',
         fontSize: RFPercentage(2.5),
         color: "#e6b637",
         borderColor: '#e6b637',
         borderBottomWidth: 1,
         textAlign: 'left'
-    },
-    inputBox2: {
-        marginTop: '1.3%',
-        width: '70%',
-        margin: '2.6%',
-        fontSize: RFPercentage(2.5),
-        color: "#e6b637",
-        borderColor: '#e6b637',
-        borderBottomWidth: 1,
-        textAlign: 'left',
-        marginBottom: '13%',
     },
     buttonStyle: {
         width: '50%',
