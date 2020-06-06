@@ -219,8 +219,8 @@ export default class ProfileScreen extends React.Component {
     conditionalGreeting = () => {
         if (this.props.route.params.isPsychologist) {
             return (
-                <View style={styles.container2p}>
-                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3), }}>
+                <View style={styles.container2}>
+                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3), paddingTop: '5%' }}>
                         ¿Te encuentras disponible?
                     </Text>
                 </View>
@@ -228,7 +228,7 @@ export default class ProfileScreen extends React.Component {
         } else {
             return (
                 <View style={styles.container2}>
-                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '1%' }}>
+                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125), paddingBottom: '1%', paddingTop: '10%' }}>
                         Cuéntanos,
                     </Text>
                     <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
@@ -379,11 +379,12 @@ export default class ProfileScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: SCREEN_HEIGHT - 10,
+        height: SCREEN_HEIGHT + 10,
         flexDirection: 'column',
         backgroundColor: '#ffedd2',
         justifyContent: 'center',
         alignContent: 'stretch',
+        paddingTop: '10%'
     },
     canvas: {
         flex: 4,
@@ -398,7 +399,6 @@ const styles = StyleSheet.create({
         flex: 3,
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: StatusBar.currentHeight,
     },
     container1text: {
         flex: 1,
@@ -415,13 +415,6 @@ const styles = StyleSheet.create({
         flex: 0,
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop: '10%'
-    },
-    container2p: {
-        flex: 0,
-        flexDirection: 'column',
-        alignItems: 'center',
-        marginTop: '5%',
     },
     containerInput: {
         flex: 2.5,
@@ -439,7 +432,7 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
     },
     addimg: {
-        height: '75%',
+        width: '75%',
         aspectRatio: 1,
         borderRadius: 10000,
         overflow: 'hidden',

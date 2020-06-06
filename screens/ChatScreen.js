@@ -25,6 +25,36 @@ export default class Chat extends React.Component {
         this.state.messageListener();
     }
 
+    conditionalChatWindow = () => {
+        if (this.props.route.params[0].profilePicture) {
+            return (
+                <GiftedChat
+                    messages={this.state.messages}
+                    onSend={messages => this.onSend(messages)}
+                    showUserAvatar={true}
+                    user={
+                        {
+                            _id: this.props.route.params[0].uid,
+                            name: this.props.route.params[0].username,
+                            avatar: this.props.route.params[0].profilePicture,
+                        }
+                    }
+                />);
+        } else {
+            return (<GiftedChat
+                messages={this.state.messages}
+                onSend={messages => this.onSend(messages)}
+                showUserAvatar={true}
+                user={
+                    {
+                        _id: this.props.route.params[0].uid,
+                        name: this.props.route.params[0].username,
+                    }
+                }
+            />);
+        }
+    }
+
     addMessageListener = async () => {
         if (this.state.convoRef == null) {
             var ref;
@@ -127,18 +157,7 @@ export default class Chat extends React.Component {
                     <Text style={{ color: '#ffedd2', fontSize: 20 }}>{this.props.route.params[2]}</Text>
                 }
                     containerStyle={{ backgroundColor: '#4f3976', }} />
-                <GiftedChat
-                    messages={this.state.messages}
-                    onSend={messages => this.onSend(messages)}
-                    showUserAvatar={true}
-                    user={
-                        {
-                            _id: this.props.route.params[0].uid,
-                            name: this.props.route.params[0].username,
-                            avatar: this.props.route.params[0].profilePicture.uri,
-                        }
-                    }
-                />
+                <>{this.conditionalChatWindow()}</>
             </View>
         );
     }

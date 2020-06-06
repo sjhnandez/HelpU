@@ -69,7 +69,7 @@ export default class SignInScreen extends React.Component {
                 let picture;
                 await st.ref(('profile pictures/' + user.uid)).getDownloadURL().then(img => {
                     picture = { uri: img };
-                });
+                }).catch(()=>{});
                 const splitEmail = user.email.split("@");
                 const companiesRef = db.collection('companies');
                 const query = companiesRef.where('email domain', '==', splitEmail[1]);

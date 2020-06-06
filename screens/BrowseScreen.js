@@ -9,8 +9,6 @@ import { st } from '../config/Firebase';
 import { db } from '../config/Firebase';
 import SelectableProfile from '../components/SelectableProfile';
 import * as Linking from 'expo-linking';
-import ChatScreen from './ChatScreen';
-import { isAvailable } from 'expo/build/AR';
 
 const UPDATE_DELAY = 10000;
 
@@ -30,15 +28,15 @@ export default class BrowseScreen extends React.Component {
         }
     }
 
-    callVolunteer = () => {
+/*     callVolunteer = () => {
         Linking.openURL('tel:+123456789');
-    }
+    } */
 
-    /* messageVolunteer = () => {
+    messageVolunteer = () => {
         const volunteeruid = this.state.selectedUser.uid;
         const username = this.state.selectedUser.username;
         this.props.navigation.navigate('ChatScreen', [this.props.route.params, volunteeruid, username]);
-    } */
+    }
 
     fetchAll = async () => {
         let listener;
@@ -54,7 +52,21 @@ export default class BrowseScreen extends React.Component {
                             }).catch(() => {
                                 console.log('Error loading picture for ' + data.username);
                             });
-                            this.setState({ userList: [...this.state.userList, data] });
+                            if (change.type == 'added') {
+                                this.setState({ userList: [...this.state.userList, data] });
+                            } else {
+                                let newList = this.state.userList.map(profile => {
+                                    if (profile.uid == change.doc.id) {
+                                        return data;
+                                    } else {
+                                        return profile;
+                                    }
+                                });
+                                this.setState({ userList: newList });
+                                if (this.state.selectedUser.uid == change.doc.id) {
+                                    this.showProfile(change.doc.id);
+                                }
+                            }
                         } else if ((change.type == 'modified' && !change.doc.get('isAvailable')) || change.type == 'removed') {
                             let newList = this.state.userList.filter(profile => profile.uid != change.doc.id);
                             this.setState({ userList: newList });
@@ -203,7 +215,7 @@ export default class BrowseScreen extends React.Component {
                                     {this.state.selectedUser.age}
                                 </Text>
                                 <Text adjustsFontSizeToFit
-                                    numberOfLines={5}
+                                    numberOfLines={4}
                                     style={{ fontFamily: 'AvenirBold', fontSize: RFPercentage(2.5), color: '#4f3976', textAlign: 'left' }}>
                                     {this.state.selectedUser.status}
                                 </Text>
@@ -230,9 +242,11 @@ export default class BrowseScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        height: '106%',
+        width: '100%',
         flexDirection: 'column',
         backgroundColor: '#ffedd2',
+        paddingTop: '10%'
     },
     topContainer: {
         flex: 1,
@@ -277,7 +291,7 @@ const styles = StyleSheet.create({
         flex: 0,
         flexDirection: 'row',
         alignItems: 'center',
-        padding: '5%',
+        padding: '10%',
         paddingTop: '10%'
     },
 });
