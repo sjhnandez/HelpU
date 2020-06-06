@@ -6,6 +6,7 @@ import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import TabbedHub from './screens/TabbedHub';
+import ChatScreen from './screens/ChatScreen';
 
 
 const Stack = createStackNavigator();
@@ -20,7 +21,8 @@ export default class App extends React.Component {
 					<Stack.Screen name="HomeScreen" component={HomeScreen} />
 					<Stack.Screen name="RegisterScreen" component={RegisterScreen} />
 					<Stack.Screen name="LoginScreen" component={LoginScreen} />
-					<Stack.Screen name='TabbedHub' component={TabbedHub} />
+					<Stack.Screen name="TabbedHub" component={TabbedHub} />
+					<Stack.Screen name="ChatScreen" component ={ChatScreen}/>
 				</Stack.Navigator>
 			</NavigationContainer>
 		);

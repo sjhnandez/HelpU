@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, Dimensions, StatusBar, Switch, AppState } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, Dimensions, StatusBar, Switch, AppState, TextInput, Keyboard } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo'
 import EmotionButton from '../components/EmotionButton';
@@ -12,8 +12,13 @@ import { st } from '../config/Firebase';
 import { db } from '../config/Firebase';
 import Carousel from 'react-native-snap-carousel';
 import { moderateScale } from 'react-native-size-matters';
+import { Button } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
+
+
 const UPDATE_DELAY = 2000;
 
 export default class ProfileScreen extends React.Component {
@@ -30,6 +35,7 @@ export default class ProfileScreen extends React.Component {
         uid: null,
         isAvailable: false,
         status: null,
+        updateStatus: false,
         updateTimer: null,
         carouselItems: [
             {
@@ -105,19 +111,30 @@ export default class ProfileScreen extends React.Component {
             'AvenirItalic': require('../assets/fonts/AvenirNextLTPro-It.otf'),
             'AvenirReg': require('../assets/fonts/AvenirNextLTPro-Regular.otf')
         });
-        await st.ref(('profile pictures/' + this.state.uid)).getDownloadURL().then(img => {
+        if (this.props.route.params.profilePicture) {
+            this.setState({ profilePicture: this.props.route.params.profilePicture }, () => this.setState({ fontsAndPictureLoaded: true }));
+        } else {
+            this.setState({ profilePicture: require('../assets/plus.png') }, () => this.setState({ fontsAndPictureLoaded: true }));
+        }
+        /* await st.ref(('profile pictures/' + this.state.uid)).getDownloadURL().then(img => {
             this.setState({ profilePicture: { uri: img } }, () => this.setState({ fontsAndPictureLoaded: true }));
         }).catch(() => {
             this.setState({ profilePicture: require('../assets/plus.png') }, () => this.setState({ fontsAndPictureLoaded: true }));
-        });
+        }); */
     }
 
     manageInputUpdates = async () => {
         clearInterval(this.state.updateTimer);
         console.log('Uploading changes...')
         if (this.props.route.params.isPsychologist) {
-            if (this.state.isAvailable!=null) {
+            if (this.state.isAvailable != null) {
                 this.state.psychDBref.update({ isAvailable: this.state.isAvailable }).catch(error => {
+                    console.error('Error writing document', error);
+                });
+            }
+            if (this.state.status != null && this.state.updateStatus) {
+                this.setState({ updateStatus: false });
+                this.state.psychDBref.update({ status: this.state.status }).catch(error => {
                     console.error('Error writing document', error);
                 });
             }
@@ -126,6 +143,9 @@ export default class ProfileScreen extends React.Component {
                 this.state.userDBref.update({ emotionalState: this.state.emotionalState })
             }
         }
+    }
+
+    setStatus = async () => {
 
     }
 
@@ -199,12 +219,9 @@ export default class ProfileScreen extends React.Component {
     conditionalGreeting = () => {
         if (this.props.route.params.isPsychologist) {
             return (
-                <View style={styles.container2}>
-                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125), marginBottom: '1%' }}>
-                        ¿Te encuentras disponible
-                    </Text>
-                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3.125) }}>
-                        para dar ayuda psicológica?
+                <View style={styles.container2p}>
+                    <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3), }}>
+                        ¿Te encuentras disponible?
                     </Text>
                 </View>
             );
@@ -267,6 +284,32 @@ export default class ProfileScreen extends React.Component {
                             ]
                         }}
                     />
+                    <View style={{ flex: 0.7, flexDirection: 'column', width: '100%', paddingHorizontal: '5%' }}>
+                        <Text style={{ fontFamily: 'AvenirBold', color: '#4b3c74', fontSize: RFPercentage(3), textAlign: 'left', marginBottom: '2%' }}>
+                            Estado:
+                        </Text>
+                        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between', alignItems: 'center' }}>
+                            <TextInput style={{ width: '80%', height: '100%', borderColor: '#4b3c74', borderWidth: 1, borderRadius: 15, paddingHorizontal: '5%' }}
+                                multiline={true}
+                                onChangeText={status => { this.setState({ status }) }}
+                            />
+                            <Button onPress={() => {
+                                Keyboard.dismiss();
+                                this.setState({ updateStatus: true }, () => {
+                                    clearInterval(this.state.updateTimer);
+                                    this.setState({ updateTimer: setInterval(this.manageInputUpdates, UPDATE_DELAY) });
+                                })
+                            }} icon={
+                                <Icon
+                                    name="check-circle"
+                                    size={60}
+                                    color="#4b3c74"
+                                />
+                            }
+                                buttonStyle={{ backgroundColor: '#transparent,', borderRadius: 1000, padding: 0 }} />
+                        </View>
+                    </View>
+
                 </View>
             );
         } else {
@@ -322,7 +365,7 @@ export default class ProfileScreen extends React.Component {
                         <Text style={{ color: '#ffedd2', fontFamily: 'AvenirBold', fontSize: RFPercentage(2.5) }}>
                             no ha sido tu día...
                         </Text>
-                        <Image style={{ height: '20%', aspectRatio: 310 / 128, margin: '5%' }} source={require('../assets/logo_register.png')} />
+                        <Image style={{ height: '20%', aspectRatio: 310 / 128, margin: '10%' }} source={require('../assets/logo_register.png')} />
                     </ImageBackground>
                 </View>
             );
@@ -335,7 +378,8 @@ export default class ProfileScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        width: '100%',
+        height: SCREEN_HEIGHT - 10,
         flexDirection: 'column',
         backgroundColor: '#ffedd2',
         justifyContent: 'center',
@@ -348,7 +392,7 @@ const styles = StyleSheet.create({
         height: undefined,
         alignSelf: 'stretch',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
     },
     container1: {
         flex: 3,
@@ -373,9 +417,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: '10%'
     },
+    container2p: {
+        flex: 0,
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginTop: '5%',
+    },
     containerInput: {
         flex: 2.5,
-        justifyContent: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
         alignItems: 'center',
     },
     container_singlebutton: {

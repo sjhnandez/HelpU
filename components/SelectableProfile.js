@@ -20,33 +20,31 @@ export default class SelectableProfile extends React.Component {
     render() {
         if (this.state.fontsLoaded) {
             return (
-                <TouchableOpacity activeOpacity={0.5} style={{ width: '90%', height: undefined, aspectRatio: 3, marginHorizontal: '5%', marginVertical: '3%', borderRadius:15, overflow:'hidden' }}
+                <TouchableOpacity activeOpacity={0.5} style={{ width: '90%', aspectRatio: 3, marginVertical: '3%' }}
                     onPress={this.props.showProfile}
                 >
-                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#4f3976' }}>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Image style={{ height: '65%', width: undefined, aspectRatio: 1, borderRadius: 10000, overflow:'hidden' }}
-                                source={this.props.profilePicture}
-                                resizeMode='stretch'
-                            />
-                        </View>
-                        <View style={{ flex: 2, flexDirection: 'column', justifyContent: 'center' }}>
+                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#4f3976', borderRadius: 15, justifyContent: 'center' }}>
+                        <Image style={{width:'20%', aspectRatio: 1, borderRadius: 10000, borderWidth: 1, borderColor: 'white', alignSelf:'center' , marginHorizontal:'4%'}}
+                            source={this.props.profilePicture}
+                            resizeMode='cover'
+                        />
+                        <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center'}}>
                             <Text adjustsFontSizeToFit
-                            numberOfLines={2}
-                            style={{ fontFamily: 'AvenirBold', fontSize: RFPercentage(2.5), color: '#ffbc31', marginRight: '5%'}}>
+                                numberOfLines={2}
+                                style={{ fontFamily: 'AvenirBold', fontSize: RFPercentage(2.5), color: '#ffbc31', }}>
                                 {this.props.name}
                             </Text>
                             <Text adjustsFontSizeToFit
-                            numberOfLines={2}
-                            style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#ffbc31', marginRight: '6%' }}>
-                                {this.props.description}
+                                numberOfLines={2}
+                                style={{ fontFamily: 'AvenirItalic', fontSize: RFPercentage(2.5), color: '#ffbc31', }}>
+                                {this.props.info}
                             </Text>
                         </View>
                     </View>
                 </TouchableOpacity >
             );
         } else {
-            return <AppLoading/>;
+            return <AppLoading />;
         }
     }
 }

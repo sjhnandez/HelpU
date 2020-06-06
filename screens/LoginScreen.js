@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TextInput, View, Image, ImageBackground, Dimensions, Alert, StatusBar } from 'react-native';
 import Login from '../components/Login';
-import Firebase, { db } from '../config/Firebase';
+import Firebase, { db , st} from '../config/Firebase';
 import { CommonActions } from '@react-navigation/native';
 import { RFPercentage } from "react-native-responsive-fontsize";
 
@@ -13,10 +13,10 @@ export default class SignInScreen extends React.Component {
         password: null,
         company: null,
         isPsychologist: false,
-        isCompanyPsychologist:false,
+        isCompanyPsychologist: false,
     };
 
-    goToProfile = uid => {
+    goToProfile = (uid, picture) => {
         let dbref;
         if (this.state.isPsychologist) {
             dbref = 'registeredPsychologists';
@@ -28,7 +28,9 @@ export default class SignInScreen extends React.Component {
             params.uid = uid;
             params.company = this.state.company;
             params.isPsychologist = this.state.isPsychologist;
-            params.isCompanyPsychologist=this.state.isCompanyPsychologist;
+            params.isCompanyPsychologist = this.state.isCompanyPsychologist;
+            params.profilePicture = picture;
+            console.log(params);
             this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 1,
@@ -55,7 +57,7 @@ export default class SignInScreen extends React.Component {
             );
             console.log(error);
             return;
-        }).then(async(result) => {
+        }).then(async (result) => {
             if (result) {
                 const user = result.user;
                 const psychCollectionRef = db.collection('registeredPsychologists');
@@ -63,6 +65,10 @@ export default class SignInScreen extends React.Component {
                     if (doc.exists) {
                         this.setState({ isPsychologist: true });
                     }
+                });
+                let picture;
+                await st.ref(('profile pictures/' + user.uid)).getDownloadURL().then(img => {
+                    picture = { uri: img };
                 });
                 const splitEmail = user.email.split("@");
                 const companiesRef = db.collection('companies');
@@ -78,7 +84,7 @@ export default class SignInScreen extends React.Component {
                             }
                         });
                     }
-                }).then(this.goToProfile(user.uid));
+                }).then(this.goToProfile(user.uid, picture));
             }
         });
     }

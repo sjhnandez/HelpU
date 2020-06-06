@@ -1,26 +1,28 @@
-import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ProfileScreen from './ProfileScreen';
-import ChatScreen from './ChatScreen';
+import BrowseScreen from './BrowseScreen';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { st } from '../config/Firebase'
+import { AppLoading } from 'expo'
 
 const Tab = createBottomTabNavigator();
 
-export default function TabbedHub(props) {
-    return (
-        <NavigationContainer independent={true} >
+
+export default class TabbedHub extends React.Component {
+    render() {
+        return (
             <Tab.Navigator tab tabBarOptions={{
                 activeBackgroundColor: '#4f3976',
                 inactiveBackgroundColor: '#4f3976',
                 activeTintColor: '#e6b637',
-                inactiveTintColor:'#ffffff',
+                inactiveTintColor: '#ffffff',
                 style: { borderTopWidth: 0 },
             }}
-            lazy={true}>
+                lazy={true}>
                 <Tab.Screen name="Perfil"
                     component={ProfileScreen}
-                    initialParams={props.route.params}
+                    initialParams={this.props.route.params}
                     options={{
                         tabBarLabel: 'Perfil',
                         tabBarIcon: ({ color, size }) => (
@@ -28,8 +30,8 @@ export default function TabbedHub(props) {
                         ),
                     }} />
                 <Tab.Screen name="Chat"
-                    component={ChatScreen}
-                    initialParams={props.route.params}
+                    component={BrowseScreen}
+                    initialParams={this.props.route.params}
                     options={{
                         tabBarLabel: 'Chat',
                         tabBarIcon: ({ color, size }) => (
@@ -37,6 +39,6 @@ export default function TabbedHub(props) {
                         ),
                     }} />
             </Tab.Navigator>
-        </NavigationContainer>
-    );
+        );
+    }
 }
